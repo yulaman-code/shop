@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Корзина — Магазин</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="logo">Магазин</a>
+    <div class="nav-links">
+      <a href="/logout">Выйти ({{.CurrentUser.Username}})</a>
+    </div>
+  </nav>
+
+  <div class="cart-page">
+    <h2>Корзина</h2>
+
+    {{if .Lines}}
+    <table class="cart-table">
+      <thead>
+        <tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th><th></th></tr>
+      </thead>
+      <tbody>
+        {{range .Lines}}
+        <tr>
+          <td>{{.Title}}</td>
+          <td>{{.Price}} ₽</td>
+          <td>{{.Quantity}}</td>
+          <td>{{.Subtotal}} ₽</td>
+          <td>
+            <form method="POST" action="/cart/remove/{{.ProductID}}">
+              <button type="submit" class="small-btn">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+
+    <div class="cart-total">Итого: {{.Total}} ₽</div>
+
+    <form method="POST" action="/cart/checkout">
+      <button type="submit">Оформить заказ</button>
+    </form>
+    {{else}}
+    <p class="empty">Корзина пуста. <a href="/">Вернуться в каталог</a></p>
+    {{end}}
+  </div>
+</body>
+</html>

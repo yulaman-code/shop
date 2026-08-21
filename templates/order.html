@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Заказ №{{.Order.ID}} — Магазин</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="logo">Магазин</a>
+    <div class="nav-links">
+      <a href="/logout">Выйти ({{.CurrentUser.Username}})</a>
+    </div>
+  </nav>
+
+  <div class="cart-page">
+    <h2>Заказ №{{.Order.ID}} оформлен</h2>
+    <p class="muted">{{.Order.CreatedAt}}</p>
+
+    <table class="cart-table">
+      <thead>
+        <tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th></tr>
+      </thead>
+      <tbody>
+        {{range .Lines}}
+        <tr>
+          <td>{{.Title}}</td>
+          <td>{{.Price}} ₽</td>
+          <td>{{.Quantity}}</td>
+          <td>{{.Subtotal}} ₽</td>
+        </tr>
+        {{end}}
+      </tbody>
+    </table>
+
+    <div class="cart-total">Итого: {{.Order.Total}} ₽</div>
+
+    <p><a href="/">Продолжить покупки</a></p>
+  </div>
+</body>
+</html>
