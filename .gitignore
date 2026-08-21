@@ -2,3 +2,5 @@ shop.db
 shop.db-journal
 shop.db-shm
 shop.db-wal
+shop_fix.db
+.DS_Store
