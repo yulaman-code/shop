@@ -4,3 +4,5 @@ shop.db-shm
 shop.db-wal
 shop_fix.db
 .DS_Store
+shop_fix.db
+.DS_Store
