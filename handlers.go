@@ -38,13 +38,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 
 // ---------- Корзина ----------
 
-func cartAddHandler(w http.ResponseWriter, r *http.Request) {
-	user := currentUser(r)
-	if user == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
+func cartAddHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.NotFound(w, r)
@@ -70,13 +64,7 @@ type CartData struct {
 	Error       string
 }
 
-func cartHandler(w http.ResponseWriter, r *http.Request) {
-	user := currentUser(r)
-	if user == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
+func cartHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	lines, total, err := getCart(user.ID)
 	if err != nil {
 		log.Println(err)
@@ -91,13 +79,7 @@ func cartHandler(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-func cartRemoveHandler(w http.ResponseWriter, r *http.Request) {
-	user := currentUser(r)
-	if user == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
+func cartRemoveHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.NotFound(w, r)
@@ -113,13 +95,7 @@ func cartRemoveHandler(w http.ResponseWriter, r *http.Request) {
 
 // ---------- Оформление заказа ----------
 
-func checkoutHandler(w http.ResponseWriter, r *http.Request) {
-	user := currentUser(r)
-	if user == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
+func checkoutHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	orderID, err := checkout(user.ID)
 	if err != nil {
 		log.Println("оформление заказа не удалось:", err)
@@ -136,13 +112,7 @@ type OrderData struct {
 	Lines       []OrderLine
 }
 
-func orderHandler(w http.ResponseWriter, r *http.Request) {
-	user := currentUser(r)
-	if user == nil {
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-
+func orderHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
 		http.NotFound(w, r)

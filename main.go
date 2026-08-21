@@ -18,14 +18,14 @@ func main() {
 	// Каталог
 	mux.HandleFunc("GET /", catalogHandler)
 
-	// Корзина
-	mux.HandleFunc("POST /cart/add/{id}", cartAddHandler)
-	mux.HandleFunc("GET /cart", cartHandler)
-	mux.HandleFunc("POST /cart/remove/{id}", cartRemoveHandler)
-	mux.HandleFunc("POST /cart/checkout", checkoutHandler)
+	// Корзина (доступна только залогиненным — requireAuth проверяет это один раз)
+	mux.HandleFunc("POST /cart/add/{id}", requireAuth(cartAddHandler))
+	mux.HandleFunc("GET /cart", requireAuth(cartHandler))
+	mux.HandleFunc("POST /cart/remove/{id}", requireAuth(cartRemoveHandler))
+	mux.HandleFunc("POST /cart/checkout", requireAuth(checkoutHandler))
 
-	// Заказ
-	mux.HandleFunc("GET /order/{id}", orderHandler)
+	// Заказ (тоже только для залогиненных)
+	mux.HandleFunc("GET /order/{id}", requireAuth(orderHandler))
 
 	// Пользователи
 	mux.HandleFunc("GET /register", registerFormHandler)

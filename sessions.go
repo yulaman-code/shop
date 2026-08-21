@@ -89,3 +89,23 @@ func currentUser(r *http.Request) *User {
 	}
 	return &u
 }
+
+// requireAuth — middleware. Оборачивает обработчик, которому обязательно
+// нужен залогиненный пользователь. Сама проверка "залогинен ли" происходит
+// один раз, здесь, а не повторяется внутри каждого такого обработчика.
+//
+// authedHandler — это обработчик с ДОПОЛНИТЕЛЬНЫМ параметром *User: раз
+// requireAuth уже нашёл пользователя, он сразу передаёт его дальше — самому
+// обработчику не нужно ещё раз спрашивать currentUser(r).
+type authedHandler func(w http.ResponseWriter, r *http.Request, user *User)
+
+func requireAuth(next authedHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := currentUser(r)
+		if user == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		next(w, r, user)
+	}
+}
