@@ -139,13 +139,14 @@ func seedProducts() {
 		return
 	}
 
-	demo := []Product{
-		{Title: "Механическая клавиатура", Description: "Компактная клавиатура с тактильными переключателями", Price: 6500, ImagePath: "/static/images/keyboard.png", Stock: 12},
-		{Title: "Беспроводные наушники", Description: "Активное шумоподавление, до 30 часов работы", Price: 9200, ImagePath: "/static/images/headphones.png", Stock: 8},
-		{Title: "Настольная лампа", Description: "Регулируемая яркость, USB-зарядка", Price: 2300, ImagePath: "/static/images/lamp2.png", Stock: 20},
-		{Title: "Рюкзак для ноутбука", Description: "Влагостойкий, отделение под 15-дюймовый ноутбук", Price: 3400, ImagePath: "/static/images/backpack2.png", Stock: 15},
-		{Title: "Термокружка", Description: "Держит тепло 6 часов, объём 450мл", Price: 1200, ImagePath: "/static/images/mug2.png", Stock: 30},
-		{Title: "Настольный органайзер", Description: "Дерево, 5 отделений", Price: 1800, ImagePath: "/static/images/organizer.png", Stock: 0},
+	
+demo := []Product{
+		{Title: "Механическая клавиатура", Description: "Компактная клавиатура с тактильными переключателями", Price: 6500, ImagePath: "https://loremflickr.com/400/300/mechanical,keyboard/all?lock=101", Stock: 12},
+		{Title: "Беспроводные наушники", Description: "Активное шумоподавление, до 30 часов работы", Price: 9200, ImagePath: "https://loremflickr.com/400/300/wireless,headphones/all?lock=102", Stock: 8},
+		{Title: "Настольная лампа", Description: "Регулируемая яркость, USB-зарядка", Price: 2300, ImagePath: "https://loremflickr.com/400/300/desk,lamp/all?lock=103", Stock: 20},
+		{Title: "Рюкзак для ноутбука", Description: "Влагостойкий, отделение под 15-дюймовый ноутбук", Price: 3400, ImagePath: "https://loremflickr.com/400/300/laptop,backpack/all?lock=104", Stock: 15},
+		{Title: "Термокружка", Description: "Держит тепло 6 часов, объём 450мл", Price: 1200, ImagePath: "https://loremflickr.com/400/300/thermos,mug/all?lock=105", Stock: 30},
+		{Title: "Настольный органайзер", Description: "Дерево, 5 отделений", Price: 1800, ImagePath: "https://loremflickr.com/400/300/desk,organizer/all?lock=106", Stock: 0},
 	}
 
 	for _, p := range demo {
