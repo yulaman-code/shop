@@ -170,3 +170,22 @@ input:focus {
   margin: 0;
   font-size: 0.9rem;
 }
+
+.qty-control { display: flex; gap: 8px; align-items: center; flex-wrap: nowrap; }
+.qty-btn {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  flex-shrink: 0;
+  padding: 0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  line-height: 1;
+  background: #b6a6dd;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qty-btn:hover { background: #a390d1; }
+.qty-value { min-width: 24px; text-align: center; font-weight: 600; }

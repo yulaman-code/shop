@@ -28,6 +28,9 @@ func main() {
 	// Заказ (тоже только для залогиненных)
 	mux.HandleFunc("GET /order/{id}", requireAuth(orderHandler))
 
+	// Личный кабинет — история заказов
+	mux.HandleFunc("GET /account", requireAuth(accountHandler))
+
 	// Пользователи
 	mux.HandleFunc("GET /register", registerFormHandler)
 	mux.HandleFunc("POST /register", registerSubmitHandler)

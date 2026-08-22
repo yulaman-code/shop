@@ -11,6 +11,7 @@ var (
 	tmplCatalog  = template.Must(template.ParseFiles("templates/catalog.html"))
 	tmplCart     = template.Must(template.ParseFiles("templates/cart.html"))
 	tmplOrder    = template.Must(template.ParseFiles("templates/order.html"))
+	tmplAccount  = template.Must(template.ParseFiles("templates/account.html"))
 	tmplRegister = template.Must(template.ParseFiles("templates/register.html"))
 	tmplLogin    = template.Must(template.ParseFiles("templates/login.html"))
 )
@@ -72,10 +73,16 @@ func cartHandler(w http.ResponseWriter, r *http.Request, user *User) {
 		return
 	}
 
+	errMsg := ""
+	if r.URL.Query().Get("error") == "stock" {
+		errMsg = "Недостаточно товара на складе — уменьшите количество"
+	}
+
 	tmplCart.Execute(w, CartData{
 		CurrentUser: user,
 		Lines:       lines,
 		Total:       total,
+		Error:       errMsg,
 	})
 }
 
@@ -122,7 +129,11 @@ func checkoutHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	orderID, err := checkout(user.ID)
 	if err != nil {
 		log.Println("оформление заказа не удалось:", err)
-		http.Redirect(w, r, "/cart", http.StatusSeeOther)
+		if err == errOutOfStock {
+			http.Redirect(w, r, "/cart?error=stock", http.StatusSeeOther)
+		} else {
+			http.Redirect(w, r, "/cart", http.StatusSeeOther)
+		}
 		return
 	}
 
@@ -165,6 +176,27 @@ func orderHandler(w http.ResponseWriter, r *http.Request, user *User) {
 		CurrentUser: user,
 		Order:       order,
 		Lines:       lines,
+	})
+}
+
+// ---------- Личный кабинет ----------
+
+type AccountData struct {
+	CurrentUser *User
+	Orders      []Order
+}
+
+func accountHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	orders, err := listOrdersByUser(user.ID)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Внутренняя ошибка", http.StatusInternalServerError)
+		return
+	}
+
+	tmplAccount.Execute(w, AccountData{
+		CurrentUser: user,
+		Orders:      orders,
 	})
 }
 

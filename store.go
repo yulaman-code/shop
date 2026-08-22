@@ -38,6 +38,7 @@ type CartLine struct {
 	ImagePath string
 	Quantity  int
 	Subtotal  int
+	Stock     int
 }
 
 type Order struct {
@@ -278,7 +279,7 @@ func updateCartQuantity(userID, productID, quantity int) error {
 
 func getCart(userID int) ([]CartLine, int, error) {
 	rows, err := db.Query(`
-		SELECT p.id, p.title, p.price, p.image_path, ci.quantity
+		SELECT p.id, p.title, p.price, p.image_path, ci.quantity, p.stock
 		FROM cart_items ci
 		JOIN products p ON p.id = ci.product_id
 		WHERE ci.user_id = ?
@@ -293,7 +294,7 @@ func getCart(userID int) ([]CartLine, int, error) {
 	total := 0
 	for rows.Next() {
 		var l CartLine
-		if err := rows.Scan(&l.ProductID, &l.Title, &l.Price, &l.ImagePath, &l.Quantity); err != nil {
+		if err := rows.Scan(&l.ProductID, &l.Title, &l.Price, &l.ImagePath, &l.Quantity, &l.Stock); err != nil {
 			return nil, 0, err
 		}
 		l.Subtotal = l.Price * l.Quantity
@@ -398,6 +399,28 @@ func getOrder(orderID int) (Order, bool) {
 		return Order{}, false
 	}
 	return o, true
+}
+
+// listOrdersByUser — все заказы конкретного пользователя, сначала новые
+func listOrdersByUser(userID int) ([]Order, error) {
+	rows, err := db.Query(
+		`SELECT id, user_id, created_at, total FROM orders WHERE user_id = ? ORDER BY created_at DESC`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	orders := make([]Order, 0)
+	for rows.Next() {
+		var o Order
+		if err := rows.Scan(&o.ID, &o.UserID, &o.CreatedAt, &o.Total); err != nil {
+			return nil, err
+		}
+		orders = append(orders, o)
+	}
+	return orders, rows.Err()
 }
 
 func getOrderLines(orderID int) ([]OrderLine, error) {
