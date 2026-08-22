@@ -21,10 +21,19 @@ var (
 type CatalogData struct {
 	CurrentUser *User
 	Products    []Product
+	Query       string
 }
 
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
-	products, err := listProducts()
+	query := r.URL.Query().Get("q")
+
+	var products []Product
+	var err error
+	if query != "" {
+		products, err = searchProducts(query)
+	} else {
+		products, err = listProducts()
+	}
 	if err != nil {
 		log.Println(err)
 		http.Error(w, "Внутренняя ошибка", http.StatusInternalServerError)
@@ -34,6 +43,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 	tmplCatalog.Execute(w, CatalogData{
 		CurrentUser: currentUser(r),
 		Products:    products,
+		Query:       query,
 	})
 }
 

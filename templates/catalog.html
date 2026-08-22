@@ -23,6 +23,18 @@
     </div>
   </nav>
 
+  <div class="search-bar">
+    <form method="GET" action="/">
+      <input type="text" name="q" placeholder="Поиск товаров..." value="{{.Query}}" class="search-input">
+      <button type="submit">Найти</button>
+      {{if .Query}}<a href="/" class="small-btn">Сбросить</a>{{end}}
+    </form>
+  </div>
+
+  {{if and .Query (not .Products)}}
+  <p class="empty">По запросу «{{.Query}}» ничего не найдено. <a href="/">Показать все товары</a></p>
+  {{end}}
+
   <div class="grid">
     {{range .Products}}
     <div class="card">

@@ -189,3 +189,15 @@ input:focus {
 }
 .qty-btn:hover { background: #a390d1; }
 .qty-value { min-width: 24px; text-align: center; font-weight: 600; }
+
+
+.search-bar { max-width: 1100px; margin: 20px auto 0; padding: 0 20px; }
+.search-bar form { display: flex; gap: 10px; align-items: center; }
+.search-input {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 14px;
+  border: 1px solid #e0dced;
+  border-radius: 10px;
+  font-size: 0.95rem;
+}

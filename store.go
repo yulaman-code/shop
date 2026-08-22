@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	_ "modernc.org/sqlite"
 )
@@ -232,6 +233,27 @@ func listProducts() ([]Product, error) {
 		products = append(products, p)
 	}
 	return products, rows.Err()
+}
+
+// searchProducts — ищет товары, содержащие запрос в названии или описании.
+// Фильтрацию делаем в Go через strings.ToLower: встроенный SQLite LOWER()
+// и COLLATE NOCASE не умеют приводить регистр кириллицы, а Go — умеет.
+func searchProducts(query string) ([]Product, error) {
+	all, err := listProducts()
+	if err != nil {
+		return nil, err
+	}
+
+	q := strings.ToLower(strings.TrimSpace(query))
+	result := make([]Product, 0)
+	for _, p := range all {
+		title := strings.ToLower(p.Title)
+		desc := strings.ToLower(p.Description)
+		if strings.Contains(title, q) || strings.Contains(desc, q) {
+			result = append(result, p)
+		}
+	}
+	return result, nil
 }
 
 func findProductByID(id int) (Product, bool) {
