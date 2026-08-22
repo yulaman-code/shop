@@ -93,6 +93,29 @@ func cartRemoveHandler(w http.ResponseWriter, r *http.Request, user *User) {
 	http.Redirect(w, r, "/cart", http.StatusSeeOther)
 }
 
+// cartUpdateHandler — меняет количество конкретного товара в корзине
+// на значение, введённое пользователем в поле формы.
+func cartUpdateHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	quantity, err := strconv.Atoi(r.FormValue("quantity"))
+	if err != nil {
+		// Некорректный ввод — просто возвращаемся в корзину без изменений
+		http.Redirect(w, r, "/cart", http.StatusSeeOther)
+		return
+	}
+
+	if err := updateCartQuantity(user.ID, id, quantity); err != nil {
+		log.Println(err)
+	}
+
+	http.Redirect(w, r, "/cart", http.StatusSeeOther)
+}
+
 // ---------- Оформление заказа ----------
 
 func checkoutHandler(w http.ResponseWriter, r *http.Request, user *User) {

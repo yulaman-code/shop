@@ -22,6 +22,7 @@ func main() {
 	mux.HandleFunc("POST /cart/add/{id}", requireAuth(cartAddHandler))
 	mux.HandleFunc("GET /cart", requireAuth(cartHandler))
 	mux.HandleFunc("POST /cart/remove/{id}", requireAuth(cartRemoveHandler))
+	mux.HandleFunc("POST /cart/update/{id}", requireAuth(cartUpdateHandler))
 	mux.HandleFunc("POST /cart/checkout", requireAuth(checkoutHandler))
 
 	// Заказ (тоже только для залогиненных)

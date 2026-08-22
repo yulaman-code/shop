@@ -263,6 +263,19 @@ func removeFromCart(userID, productID int) error {
 	return err
 }
 
+// updateCartQuantity — устанавливает точное количество товара в корзине.
+// Если новое количество 0 или меньше — товар просто удаляется из корзины.
+func updateCartQuantity(userID, productID, quantity int) error {
+	if quantity <= 0 {
+		return removeFromCart(userID, productID)
+	}
+	_, err := db.Exec(
+		`UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?`,
+		quantity, userID, productID,
+	)
+	return err
+}
+
 func getCart(userID int) ([]CartLine, int, error) {
 	rows, err := db.Query(`
 		SELECT p.id, p.title, p.price, p.image_path, ci.quantity

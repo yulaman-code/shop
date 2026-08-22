@@ -26,11 +26,20 @@
       </thead>
       <tbody>
         {{range .Lines}}
-        <tr>
+        <tr data-row-id="{{.ProductID}}">
           <td>{{.Title}}</td>
           <td>{{.Price}} ₽</td>
-          <td>{{.Quantity}}</td>
-          <td>{{.Subtotal}} ₽</td>
+          <td>
+            <input
+              type="number"
+              class="qty-input qty-live"
+              value="{{.Quantity}}"
+              min="0"
+              data-product-id="{{.ProductID}}"
+              data-price="{{.Price}}"
+            >
+          </td>
+          <td class="subtotal-cell" data-subtotal-for="{{.ProductID}}">{{.Subtotal}} ₽</td>
           <td>
             <form method="POST" action="/cart/remove/{{.ProductID}}">
               <button type="submit" class="small-btn">Удалить</button>
@@ -41,7 +50,7 @@
       </tbody>
     </table>
 
-    <div class="cart-total">Итого: {{.Total}} ₽</div>
+    <div class="cart-total" id="cart-total">Итого: {{.Total}} ₽</div>
 
     <form method="POST" action="/cart/checkout">
       <button type="submit">Оформить заказ</button>
@@ -50,5 +59,60 @@
     <p class="empty">Корзина пуста. <a href="/">Вернуться в каталог</a></p>
     {{end}}
   </div>
+
+  <script>
+    // saveTimers — храним по одному "таймеру ожидания" на каждый товар,
+    // чтобы не отправлять запрос на сервер при КАЖДОМ нажатии клавиши,
+    // а только когда пользователь на секунду остановился вводить число.
+    // Это называется "debounce" (сглаживание частых событий).
+    const saveTimers = {};
+
+    function recalcTotals() {
+      let total = 0;
+      document.querySelectorAll('.qty-live').forEach((input) => {
+        const price = parseInt(input.dataset.price, 10);
+        const quantity = parseInt(input.value, 10) || 0;
+        const subtotal = price * quantity;
+        total += subtotal;
+
+        const cell = document.querySelector(
+          `[data-subtotal-for="${input.dataset.productId}"]`
+        );
+        if (cell) {
+          cell.textContent = subtotal + ' ₽';
+        }
+      });
+
+      document.getElementById('cart-total').textContent = 'Итого: ' + total + ' ₽';
+    }
+
+    function scheduleSave(productId, quantity) {
+      // Если для этого товара уже был запланирован запрос — отменяем его
+      // и планируем заново. Так, если пользователь быстро крутит стрелочки
+      // ввода 5 раз подряд, на сервер уйдёт только ОДИН запрос, а не 5.
+      clearTimeout(saveTimers[productId]);
+
+      saveTimers[productId] = setTimeout(() => {
+        fetch(`/cart/update/${productId}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `quantity=${quantity}`,
+        }).then(() => {
+          if (quantity <= 0) {
+            // Товар удалён на сервере — обновляем страницу,
+            // чтобы строка тоже пропала визуально
+            location.reload();
+          }
+        });
+      }, 500);
+    }
+
+    document.querySelectorAll('.qty-live').forEach((input) => {
+      input.addEventListener('input', () => {
+        recalcTotals();
+        scheduleSave(input.dataset.productId, input.value);
+      });
+    });
+  </script>
 </body>
 </html>
