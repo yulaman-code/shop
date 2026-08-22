@@ -191,7 +191,7 @@ input:focus {
 .qty-value { min-width: 24px; text-align: center; font-weight: 600; }
 
 
-.search-bar { max-width: 1100px; margin: 20px auto 0; padding: 0 20px; }
+.search-bar { margin: 20px 0 0; padding: 0 36px; }
 .search-bar form { display: flex; gap: 10px; align-items: center; }
 .search-input {
   flex: 1;
