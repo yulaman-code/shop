@@ -26,18 +26,15 @@
       </thead>
       <tbody>
         {{range .Lines}}
-        <tr data-row-id="{{.ProductID}}">
+        <tr>
           <td>{{.Title}}</td>
           <td>{{.Price}} ₽</td>
           <td>
-            <input
-              type="number"
-              class="qty-input qty-live"
-              value="{{.Quantity}}"
-              min="0"
-              data-product-id="{{.ProductID}}"
-              data-price="{{.Price}}"
-            >
+            <div class="qty-control" data-product-id="{{.ProductID}}" data-price="{{.Price}}">
+              <button type="button" class="qty-btn qty-dec">−</button>
+              <span class="qty-value">{{.Quantity}}</span>
+              <button type="button" class="qty-btn qty-inc">+</button>
+            </div>
           </td>
           <td class="subtotal-cell" data-subtotal-for="{{.ProductID}}">{{.Subtotal}} ₽</td>
           <td>
@@ -61,22 +58,19 @@
   </div>
 
   <script>
-    // saveTimers — храним по одному "таймеру ожидания" на каждый товар,
-    // чтобы не отправлять запрос на сервер при КАЖДОМ нажатии клавиши,
-    // а только когда пользователь на секунду остановился вводить число.
-    // Это называется "debounce" (сглаживание частых событий).
     const saveTimers = {};
 
     function recalcTotals() {
       let total = 0;
-      document.querySelectorAll('.qty-live').forEach((input) => {
-        const price = parseInt(input.dataset.price, 10);
-        const quantity = parseInt(input.value, 10) || 0;
+      document.querySelectorAll('.qty-control').forEach((ctrl) => {
+        const price = parseInt(ctrl.dataset.price, 10);
+        const valueEl = ctrl.querySelector('.qty-value');
+        const quantity = parseInt(valueEl.textContent, 10) || 0;
         const subtotal = price * quantity;
         total += subtotal;
 
         const cell = document.querySelector(
-          `[data-subtotal-for="${input.dataset.productId}"]`
+          `[data-subtotal-for="${ctrl.dataset.productId}"]`
         );
         if (cell) {
           cell.textContent = subtotal + ' ₽';
@@ -87,31 +81,35 @@
     }
 
     function scheduleSave(productId, quantity) {
-      // Если для этого товара уже был запланирован запрос — отменяем его
-      // и планируем заново. Так, если пользователь быстро крутит стрелочки
-      // ввода 5 раз подряд, на сервер уйдёт только ОДИН запрос, а не 5.
       clearTimeout(saveTimers[productId]);
-
       saveTimers[productId] = setTimeout(() => {
         fetch(`/cart/update/${productId}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: `quantity=${quantity}`,
-        }).then(() => {
-          if (quantity <= 0) {
-            // Товар удалён на сервере — обновляем страницу,
-            // чтобы строка тоже пропала визуально
-            location.reload();
-          }
         });
       }, 500);
     }
 
-    document.querySelectorAll('.qty-live').forEach((input) => {
-      input.addEventListener('input', () => {
+    document.querySelectorAll('.qty-control').forEach((ctrl) => {
+      const productId = ctrl.dataset.productId;
+      const valueEl = ctrl.querySelector('.qty-value');
+      const decBtn = ctrl.querySelector('.qty-dec');
+      const incBtn = ctrl.querySelector('.qty-inc');
+
+      function currentQty() {
+        return parseInt(valueEl.textContent, 10) || 0;
+      }
+
+      function setQty(newQty) {
+        if (newQty < 1) newQty = 1;
+        valueEl.textContent = newQty;
         recalcTotals();
-        scheduleSave(input.dataset.productId, input.value);
-      });
+        scheduleSave(productId, newQty);
+      }
+
+      decBtn.addEventListener('click', () => setQty(currentQty() - 1));
+      incBtn.addEventListener('click', () => setQty(currentQty() + 1));
     });
   </script>
 </body>
