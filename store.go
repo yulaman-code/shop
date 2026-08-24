@@ -8,6 +8,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"sort"
 	"strings"
 
 	_ "modernc.org/sqlite"
@@ -238,6 +239,34 @@ func listProducts() ([]Product, error) {
 // searchProducts — ищет товары, содержащие запрос в названии или описании.
 // Фильтрацию делаем в Go через strings.ToLower: встроенный SQLite LOWER()
 // и COLLATE NOCASE не умеют приводить регистр кириллицы, а Go — умеет.
+// applyFilterSort — берёт готовый список товаров и применяет фильтр
+// "только в наличии" и сортировку по цене. Делаем в Go, чтобы одинаково
+// работало и для полного каталога, и для результатов поиска.
+func applyFilterSort(products []Product, inStockOnly bool, sortOrder string) []Product {
+	filtered := products
+	if inStockOnly {
+		filtered = make([]Product, 0)
+		for _, p := range products {
+			if p.Stock > 0 {
+				filtered = append(filtered, p)
+			}
+		}
+	}
+
+	switch sortOrder {
+	case "cheap":
+		sort.Slice(filtered, func(i, j int) bool {
+			return filtered[i].Price < filtered[j].Price
+		})
+	case "expensive":
+		sort.Slice(filtered, func(i, j int) bool {
+			return filtered[i].Price > filtered[j].Price
+		})
+	}
+
+	return filtered
+}
+
 func searchProducts(query string) ([]Product, error) {
 	all, err := listProducts()
 	if err != nil {

@@ -22,10 +22,14 @@ type CatalogData struct {
 	CurrentUser *User
 	Products    []Product
 	Query       string
+	Sort        string
+	InStock     bool
 }
 
 func catalogHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query().Get("q")
+	sortOrder := r.URL.Query().Get("sort")
+	inStockOnly := r.URL.Query().Get("instock") == "1"
 
 	var products []Product
 	var err error
@@ -40,10 +44,14 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	products = applyFilterSort(products, inStockOnly, sortOrder)
+
 	tmplCatalog.Execute(w, CatalogData{
 		CurrentUser: currentUser(r),
 		Products:    products,
 		Query:       query,
+		Sort:        sortOrder,
+		InStock:     inStockOnly,
 	})
 }
 

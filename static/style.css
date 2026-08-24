@@ -201,3 +201,24 @@ input:focus {
   border-radius: 10px;
   font-size: 0.95rem;
 }
+
+
+.sort-select {
+  padding: 10px 14px;
+  border: 1px solid #e0dced;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: #fff;
+  color: #4a4458;
+  cursor: pointer;
+}
+.instock-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+  color: #4a4458;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.instock-label input { cursor: pointer; }

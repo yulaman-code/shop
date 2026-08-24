@@ -26,8 +26,17 @@
   <div class="search-bar">
     <form method="GET" action="/">
       <input type="text" name="q" placeholder="Поиск товаров..." value="{{.Query}}" class="search-input">
-      <button type="submit">Найти</button>
-      {{if .Query}}<a href="/" class="small-btn">Сбросить</a>{{end}}
+      <select name="sort" class="sort-select">
+        <option value="">Без сортировки</option>
+        <option value="cheap" {{if eq .Sort "cheap"}}selected{{end}}>Сначала дешёвые</option>
+        <option value="expensive" {{if eq .Sort "expensive"}}selected{{end}}>Сначала дорогие</option>
+      </select>
+      <label class="instock-label">
+        <input type="checkbox" name="instock" value="1" {{if .InStock}}checked{{end}}>
+        Только в наличии
+      </label>
+      <button type="submit">Применить</button>
+      {{if or .Query .Sort .InStock}}<a href="/" class="small-btn">Сбросить</a>{{end}}
     </form>
   </div>
 
