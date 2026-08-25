@@ -12,6 +12,7 @@
   <nav class="nav">
     <a href="/" class="logo">Магазин</a>
     <div class="nav-links">
+      {{if .CurrentUser.IsAdmin}}<a href="/admin">Админка</a>{{end}}
       <a href="/cart">Корзина</a>
       <a href="/account">Мои заказы</a>
       <a href="/logout">Выйти ({{.CurrentUser.Username}})</a>

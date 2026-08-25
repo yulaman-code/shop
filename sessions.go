@@ -109,3 +109,18 @@ func requireAuth(next authedHandler) http.HandlerFunc {
 		next(w, r, user)
 	}
 }
+
+func requireAdmin(next authedHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := currentUser(r)
+		if user == nil {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+		if !user.IsAdmin {
+			http.Error(w, "Доступ только для администратора", http.StatusForbidden)
+			return
+		}
+		next(w, r, user)
+	}
+}

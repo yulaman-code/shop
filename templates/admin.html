@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Админ-панель — Магазин</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="logo">Магазин</a>
+    <div class="nav-links">
+      <a href="/admin">Админка</a>
+      <a href="/cart">Корзина</a>
+      <a href="/account">Мои заказы</a>
+      <a href="/logout">Выйти ({{.CurrentUser.Username}})</a>
+    </div>
+  </nav>
+
+  <div class="admin-page">
+    <h1>Админ-панель</h1>
+
+    {{if .Message}}
+      <p class="admin-msg">{{.Message}}</p>
+    {{end}}
+
+    <section class="admin-section">
+      <h2>Добавить товар</h2>
+      <form method="POST" action="/admin/add" class="admin-form" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Название" required>
+        <input type="text" name="description" placeholder="Описание">
+        <input type="number" name="price" placeholder="Цена, ₽" required>
+        <input type="number" name="stock" placeholder="Остаток, шт" value="0">
+        <label class="file-label">
+          Картинка
+          <input type="file" name="image" accept="image/*">
+        </label>
+        <button type="submit">Добавить</button>
+      </form>
+    </section>
+
+    <section class="admin-section">
+      <h2>Товары ({{len .Products}})</h2>
+      <form method="POST" action="/admin/save-all">
+        <table class="admin-table">
+          <thead>
+            <tr><th>ID</th><th>Фото</th><th>Название</th><th>Цена</th><th>Остаток</th></tr>
+          </thead>
+          <tbody>
+            {{range .Products}}
+            <tr>
+              <td>{{.ID}}</td>
+              <td>{{if .ImagePath}}<img src="{{.ImagePath}}" alt="{{.Title}}" class="admin-thumb">{{else}}—{{end}}</td>
+              <td>{{.Title}}</td>
+              <td><input type="number" name="price_{{.ID}}" value="{{.Price}}" class="admin-num"></td>
+              <td><input type="number" name="stock_{{.ID}}" value="{{.Stock}}" class="admin-num"></td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+        <button type="submit" class="save-all-btn">Сохранить все изменения</button>
+      </form>
+
+      <h3 class="admin-subhead">Сменить фото у товара</h3>
+      <div class="image-forms">
+        {{range .Products}}
+        <form method="POST" action="/admin/image/{{.ID}}" enctype="multipart/form-data" class="image-form">
+          <span class="image-form-title">{{.Title}}</span>
+          <input type="file" name="image" accept="image/*" required>
+          <button type="submit">Загрузить</button>
+        </form>
+        {{end}}
+      </div>
+    </section>
+  </div>
+</body>
+</html>

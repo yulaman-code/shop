@@ -14,6 +14,7 @@ var (
 	tmplOrder    = template.Must(template.ParseFiles("templates/order.html"))
 	tmplAccount  = template.Must(template.ParseFiles("templates/account.html"))
 	tmplProduct  = template.Must(template.ParseFiles("templates/product.html"))
+	tmplAdmin    = template.Must(template.ParseFiles("templates/admin.html"))
 	tmplRegister = template.Must(template.ParseFiles("templates/register.html"))
 	tmplLogin    = template.Must(template.ParseFiles("templates/login.html"))
 )
@@ -372,4 +373,109 @@ func loginSubmitHandler(w http.ResponseWriter, r *http.Request) {
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	clearSession(w, r)
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+// ---------- Админ-панель ----------
+
+type AdminData struct {
+	CurrentUser *User
+	Products    []Product
+	Message     string
+}
+
+func adminHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	products, err := listProducts()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Внутренняя ошибка", http.StatusInternalServerError)
+		return
+	}
+	tmplAdmin.Execute(w, AdminData{
+		CurrentUser: user,
+		Products:    products,
+		Message:     r.URL.Query().Get("msg"),
+	})
+}
+
+func adminAddHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		http.Redirect(w, r, "/admin?msg=Файл слишком большой", http.StatusSeeOther)
+		return
+	}
+
+	title := strings.TrimSpace(r.FormValue("title"))
+	description := strings.TrimSpace(r.FormValue("description"))
+	price, _ := strconv.Atoi(r.FormValue("price"))
+	stock, _ := strconv.Atoi(r.FormValue("stock"))
+
+	if title == "" || price <= 0 {
+		http.Redirect(w, r, "/admin?msg=Заполните название и цену", http.StatusSeeOther)
+		return
+	}
+
+	imagePath, err := saveUploadedImage(r, "image")
+	if err != nil {
+		http.Redirect(w, r, "/admin?msg=Ошибка загрузки картинки: "+err.Error(), http.StatusSeeOther)
+		return
+	}
+
+	if err := createProduct(title, description, price, imagePath, stock); err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/admin?msg=Не удалось добавить товар", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, "/admin?msg=Товар добавлен", http.StatusSeeOther)
+}
+
+func adminSaveAllHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	if err := r.ParseForm(); err != nil {
+		http.Redirect(w, r, "/admin?msg=Ошибка формы", http.StatusSeeOther)
+		return
+	}
+
+	products, err := listProducts()
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Внутренняя ошибка", http.StatusInternalServerError)
+		return
+	}
+
+	for _, p := range products {
+		idStr := strconv.Itoa(p.ID)
+		price, _ := strconv.Atoi(r.FormValue("price_" + idStr))
+		stock, _ := strconv.Atoi(r.FormValue("stock_" + idStr))
+		if price > 0 {
+			updateProduct(p.ID, price, stock)
+		}
+	}
+	http.Redirect(w, r, "/admin?msg=Изменения сохранены", http.StatusSeeOther)
+}
+
+func adminImageHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		http.Redirect(w, r, "/admin?msg=Файл слишком большой", http.StatusSeeOther)
+		return
+	}
+
+	imagePath, err := saveUploadedImage(r, "image")
+	if err != nil {
+		http.Redirect(w, r, "/admin?msg=Ошибка загрузки: "+err.Error(), http.StatusSeeOther)
+		return
+	}
+	if imagePath == "" {
+		http.Redirect(w, r, "/admin?msg=Файл не выбран", http.StatusSeeOther)
+		return
+	}
+
+	if err := updateProductImage(id, imagePath); err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/admin?msg=Не удалось обновить картинку", http.StatusSeeOther)
+		return
+	}
+	http.Redirect(w, r, "/admin?msg=Картинка обновлена", http.StatusSeeOther)
 }

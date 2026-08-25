@@ -14,6 +14,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.Handle("GET /uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir(uploadDir()))))
 
 	// Каталог
 	mux.HandleFunc("GET /", catalogHandler)
@@ -32,6 +33,11 @@ func main() {
 
 	// Личный кабинет — история заказов
 	mux.HandleFunc("GET /account", requireAuth(accountHandler))
+
+	mux.HandleFunc("GET /admin", requireAdmin(adminHandler))
+	mux.HandleFunc("POST /admin/add", requireAdmin(adminAddHandler))
+	mux.HandleFunc("POST /admin/save-all", requireAdmin(adminSaveAllHandler))
+	mux.HandleFunc("POST /admin/image/{id}", requireAdmin(adminImageHandler))
 
 	// Пользователи
 	mux.HandleFunc("GET /register", registerFormHandler)

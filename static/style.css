@@ -257,3 +257,32 @@ input:focus {
 .review-author { font-weight: 600; color: #2f2b3a; }
 .review-stars { color: #d4a017; letter-spacing: 2px; }
 .review-comment { color: #4a4458; line-height: 1.5; margin: 0; }
+
+
+.admin-page { max-width: 1000px; margin: 0 auto; padding: 24px 36px; }
+.admin-page h1 { font-size: 1.8rem; color: #2f2b3a; margin-bottom: 20px; }
+.admin-msg { background: #eaf5ea; color: #2f7a3f; padding: 10px 14px; border-radius: 10px; margin-bottom: 20px; font-size: 0.95rem; }
+.admin-section { margin-bottom: 36px; }
+.admin-section h2 { font-size: 1.3rem; color: #2f2b3a; margin-bottom: 14px; }
+.admin-form { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.admin-form input { padding: 10px 12px; border: 1px solid #e0dced; border-radius: 10px; font-size: 0.95rem; font-family: inherit; }
+.admin-form input[type="text"] { flex: 1; min-width: 160px; }
+.admin-table { width: 100%; border-collapse: collapse; }
+.admin-table th, .admin-table td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #ece9f2; }
+.admin-table th { font-size: 0.85rem; color: #6b6577; text-transform: uppercase; letter-spacing: 0.5px; }
+.admin-inline-form { display: flex; gap: 8px; align-items: center; }
+.admin-inline-form input { width: 90px; padding: 8px 10px; border: 1px solid #e0dced; border-radius: 8px; font-size: 0.9rem; }
+.admin-inline-form button { padding: 8px 16px; font-size: 0.9rem; }
+
+
+.file-label { display: flex; flex-direction: column; font-size: 0.8rem; color: #6b6577; gap: 4px; }
+.file-label input { font-size: 0.85rem; }
+.admin-thumb { width: 48px !important; height: 48px !important; object-fit: cover; border-radius: 8px; display: inline-block !important; }
+.admin-num { width: 90px; padding: 8px 10px; border: 1px solid #e0dced; border-radius: 8px; font-size: 0.9rem; }
+.save-all-btn { margin-top: 16px; }
+.admin-subhead { font-size: 1.1rem; color: #2f2b3a; margin: 32px 0 14px; }
+.image-forms { display: flex; flex-direction: column; gap: 10px; }
+.image-form { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #faf9fc; border-radius: 10px; }
+.image-form-title { min-width: 180px; font-size: 0.9rem; color: #4a4458; }
+.image-form input { flex: 1; font-size: 0.85rem; }
+.image-form button { padding: 8px 16px; font-size: 0.9rem; }

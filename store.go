@@ -21,6 +21,7 @@ type User struct {
 	Username     string
 	PasswordHash string
 	Salt         string
+	IsAdmin      bool
 }
 
 type Product struct {
@@ -140,6 +141,8 @@ func initDB() {
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatal(err)
 	}
+
+	db.Exec(`ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0`)
 }
 
 // seedProducts — наполняет каталог парой товаров при первом запуске
@@ -190,9 +193,9 @@ func hashPassword(password, salt string) string {
 func findUserByUsername(username string) (User, bool) {
 	var u User
 	err := db.QueryRow(
-		`SELECT id, username, password_hash, salt FROM users WHERE username = ?`,
+		`SELECT id, username, password_hash, salt, is_admin FROM users WHERE username = ?`,
 		username,
-	).Scan(&u.ID, &u.Username, &u.PasswordHash, &u.Salt)
+	).Scan(&u.ID, &u.Username, &u.PasswordHash, &u.Salt, &u.IsAdmin)
 	if err != nil {
 		return User{}, false
 	}
@@ -202,9 +205,9 @@ func findUserByUsername(username string) (User, bool) {
 func findUserByID(id int) (User, bool) {
 	var u User
 	err := db.QueryRow(
-		`SELECT id, username, password_hash, salt FROM users WHERE id = ?`,
+		`SELECT id, username, password_hash, salt, is_admin FROM users WHERE id = ?`,
 		id,
-	).Scan(&u.ID, &u.Username, &u.PasswordHash, &u.Salt)
+	).Scan(&u.ID, &u.Username, &u.PasswordHash, &u.Salt, &u.IsAdmin)
 	if err != nil {
 		return User{}, false
 	}
