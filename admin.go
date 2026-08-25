@@ -1,5 +1,10 @@
 package main
 
+import (
+	"log"
+	"os"
+)
+
 func createProduct(title, description string, price int, imagePath string, stock int) error {
 	_, err := db.Exec(
 		`INSERT INTO products (title, description, price, image_path, stock)
@@ -23,4 +28,17 @@ func updateProductImage(id int, imagePath string) error {
 		imagePath, id,
 	)
 	return err
+}
+
+func promoteAdminFromEnv() {
+	username := os.Getenv("ADMIN_USERNAME")
+	if username == "" {
+		return
+	}
+	if _, err := db.Exec(
+		`UPDATE users SET is_admin = 1 WHERE username = ?`,
+		username,
+	); err != nil {
+		log.Println("promoteAdminFromEnv:", err)
+	}
 }

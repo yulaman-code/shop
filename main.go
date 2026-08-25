@@ -10,6 +10,7 @@ func main() {
 	initDB()
 	defer db.Close()
 	seedProducts()
+	promoteAdminFromEnv()
 
 	mux := http.NewServeMux()
 
