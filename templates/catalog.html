@@ -47,9 +47,11 @@
   <div class="grid">
     {{range .Products}}
     <div class="card">
-      <img src="{{.ImagePath}}" alt="{{.Title}}">
+      <a href="/product/{{.ID}}" class="card-link">
+        <img src="{{.ImagePath}}" alt="{{.Title}}">
+      </a>
       <div class="card-body">
-        <h3>{{.Title}}</h3>
+        <a href="/product/{{.ID}}" class="card-link"><h3>{{.Title}}</h3></a>
         <p class="muted">{{.Description}}</p>
         <p class="price">{{.Price}} ₽</p>
         {{if gt .Stock 0}}

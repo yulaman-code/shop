@@ -222,3 +222,19 @@ input:focus {
   white-space: nowrap;
 }
 .instock-label input { cursor: pointer; }
+
+
+.card-link { text-decoration: none; color: inherit; cursor: pointer; }
+.card-link:hover h3 { color: #7c6bb0; }
+
+.product-page { max-width: 1000px; margin: 0 auto; padding: 24px 36px; }
+.back-link { display: inline-block; margin-bottom: 20px; color: #7c6bb0; text-decoration: none; font-size: 0.95rem; }
+.back-link:hover { text-decoration: underline; }
+.product-detail { display: flex; gap: 40px; flex-wrap: wrap; }
+.product-image { flex: 1; min-width: 280px; max-width: 460px; }
+.product-image img { width: 100%; border-radius: 14px; object-fit: cover; }
+.product-info { flex: 1; min-width: 280px; }
+.product-info h1 { font-size: 1.8rem; margin: 0 0 16px; color: #2f2b3a; }
+.product-desc { color: #6b6577; font-size: 1.05rem; line-height: 1.6; margin-bottom: 20px; }
+.product-price { font-size: 1.6rem; font-weight: 700; color: #7c6bb0; margin-bottom: 12px; }
+.product-stock { color: #4a8a5e; font-size: 0.95rem; margin-bottom: 20px; }

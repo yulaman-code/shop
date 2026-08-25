@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{{.Product.Title}} — Магазин</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="logo">Магазин</a>
+    <div class="nav-links">
+      {{if .CurrentUser}}
+        <a href="/cart">Корзина</a>
+        <a href="/account">Мои заказы</a>
+        <a href="/logout">Выйти ({{.CurrentUser.Username}})</a>
+      {{else}}
+        <a href="/login">Войти</a>
+        <a href="/register">Регистрация</a>
+      {{end}}
+    </div>
+  </nav>
+
+  <div class="product-page">
+    <a href="/" class="back-link">← Назад в каталог</a>
+
+    <div class="product-detail">
+      <div class="product-image">
+        <img src="{{.Product.ImagePath}}" alt="{{.Product.Title}}">
+      </div>
+      <div class="product-info">
+        <h1>{{.Product.Title}}</h1>
+        <p class="product-desc">{{.Product.Description}}</p>
+        <p class="product-price">{{.Product.Price}} ₽</p>
+        {{if gt .Product.Stock 0}}
+          <p class="product-stock">В наличии: {{.Product.Stock}} шт.</p>
+          <form method="POST" action="/cart/add/{{.Product.ID}}">
+            <button type="submit">В корзину</button>
+          </form>
+        {{else}}
+          <p class="out-of-stock">Нет в наличии</p>
+        {{end}}
+      </div>
+    </div>
+  </div>
+</body>
+</html>

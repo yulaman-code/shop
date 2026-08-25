@@ -12,6 +12,7 @@ var (
 	tmplCart     = template.Must(template.ParseFiles("templates/cart.html"))
 	tmplOrder    = template.Must(template.ParseFiles("templates/order.html"))
 	tmplAccount  = template.Must(template.ParseFiles("templates/account.html"))
+	tmplProduct  = template.Must(template.ParseFiles("templates/product.html"))
 	tmplRegister = template.Must(template.ParseFiles("templates/register.html"))
 	tmplLogin    = template.Must(template.ParseFiles("templates/login.html"))
 )
@@ -202,6 +203,32 @@ func orderHandler(w http.ResponseWriter, r *http.Request, user *User) {
 type AccountData struct {
 	CurrentUser *User
 	Orders      []Order
+}
+
+// ---------- Страница отдельного товара ----------
+
+type ProductData struct {
+	CurrentUser *User
+	Product     Product
+}
+
+func productHandler(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	product, found := findProductByID(id)
+	if !found {
+		http.NotFound(w, r)
+		return
+	}
+
+	tmplProduct.Execute(w, ProductData{
+		CurrentUser: currentUser(r),
+		Product:     product,
+	})
 }
 
 func accountHandler(w http.ResponseWriter, r *http.Request, user *User) {
