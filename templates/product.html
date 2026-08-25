@@ -44,6 +44,54 @@
         {{end}}
       </div>
     </div>
+
+    <div class="reviews">
+      <h2>Отзывы
+        {{if gt .ReviewCount 0}}
+          <span class="rating-summary">★ {{printf "%.1f" .AvgRating}} ({{.ReviewCount}})</span>
+        {{end}}
+      </h2>
+
+      {{if .ReviewError}}
+        <p class="review-error">{{.ReviewError}}</p>
+      {{end}}
+
+      {{if .CanReview}}
+        <form method="POST" action="/product/{{.Product.ID}}/review" class="review-form">
+          <label>Ваша оценка:
+            <select name="rating">
+              <option value="5">★★★★★ — отлично</option>
+              <option value="4">★★★★ — хорошо</option>
+              <option value="3">★★★ — нормально</option>
+              <option value="2">★★ — плохо</option>
+              <option value="1">★ — ужасно</option>
+            </select>
+          </label>
+          <textarea name="comment" placeholder="Поделитесь впечатлением..." rows="3" required></textarea>
+          <button type="submit">Оставить отзыв</button>
+        </form>
+      {{else if .CurrentUser}}
+        <p class="review-hint">Оставить отзыв можно после покупки товара.</p>
+      {{else}}
+        <p class="review-hint"><a href="/login">Войдите</a>, чтобы оставить отзыв.</p>
+      {{end}}
+
+      {{if .Reviews}}
+        <ul class="review-list">
+          {{range .Reviews}}
+          <li class="review-item">
+            <div class="review-head">
+              <span class="review-author">{{.Username}}</span>
+              <span class="review-stars">{{.Stars}}</span>
+            </div>
+            <p class="review-comment">{{.Comment}}</p>
+          </li>
+          {{end}}
+        </ul>
+      {{else}}
+        <p class="review-hint">Пока нет отзывов — станьте первым!</p>
+      {{end}}
+    </div>
   </div>
 </body>
 </html>

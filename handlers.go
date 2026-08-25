@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 var (
@@ -210,6 +211,11 @@ type AccountData struct {
 type ProductData struct {
 	CurrentUser *User
 	Product     Product
+	Reviews     []Review
+	AvgRating   float64
+	ReviewCount int
+	CanReview   bool
+	ReviewError string
 }
 
 func productHandler(w http.ResponseWriter, r *http.Request) {
@@ -225,10 +231,61 @@ func productHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	reviews, err := listReviews(id)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, "Внутренняя ошибка", http.StatusInternalServerError)
+		return
+	}
+	avg, count := averageRating(id)
+
+	user := currentUser(r)
+	canReview := false
+	if user != nil {
+		canReview = hasPurchased(user.ID, id) && !hasReviewed(user.ID, id)
+	}
+
 	tmplProduct.Execute(w, ProductData{
-		CurrentUser: currentUser(r),
+		CurrentUser: user,
 		Product:     product,
+		Reviews:     reviews,
+		AvgRating:   avg,
+		ReviewCount: count,
+		CanReview:   canReview,
+		ReviewError: r.URL.Query().Get("err"),
 	})
+}
+
+func reviewSubmitHandler(w http.ResponseWriter, r *http.Request, user *User) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	if !hasPurchased(user.ID, id) {
+		http.Redirect(w, r, "/product/"+strconv.Itoa(id)+"?err=Отзыв можно оставить только после покупки", http.StatusSeeOther)
+		return
+	}
+	if hasReviewed(user.ID, id) {
+		http.Redirect(w, r, "/product/"+strconv.Itoa(id)+"?err=Вы уже оставляли отзыв на этот товар", http.StatusSeeOther)
+		return
+	}
+
+	rating, _ := strconv.Atoi(r.FormValue("rating"))
+	if rating < 1 || rating > 5 {
+		http.Redirect(w, r, "/product/"+strconv.Itoa(id)+"?err=Оценка должна быть от 1 до 5", http.StatusSeeOther)
+		return
+	}
+	comment := strings.TrimSpace(r.FormValue("comment"))
+
+	if err := addReview(id, user.ID, rating, comment); err != nil {
+		log.Println(err)
+		http.Redirect(w, r, "/product/"+strconv.Itoa(id)+"?err=Не удалось сохранить отзыв", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/product/"+strconv.Itoa(id), http.StatusSeeOther)
 }
 
 func accountHandler(w http.ResponseWriter, r *http.Request, user *User) {

@@ -126,6 +126,16 @@ func initDB() {
 		user_id INTEGER NOT NULL REFERENCES users(id),
 		expires_at INTEGER NOT NULL
 	);
+
+	CREATE TABLE IF NOT EXISTS reviews (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		product_id INTEGER NOT NULL REFERENCES products(id),
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		rating INTEGER NOT NULL,
+		comment TEXT NOT NULL,
+		created_at INTEGER NOT NULL,
+		UNIQUE(product_id, user_id)
+	);
 	`
 	if _, err := db.Exec(schema); err != nil {
 		log.Fatal(err)
