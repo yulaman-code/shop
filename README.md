@@ -4,6 +4,8 @@ A full-stack online shop built from scratch in Go with a SQLite backend — cata
 
 **Live demo:** https://shop3-production.up.railway.app
 
+![Catalog](docs/screenshot-catalog.png)
+
 ## Features
 
 - **Product catalog** with case-insensitive search (works with Cyrillic too), price sorting, and an in-stock filter, all combinable via URL parameters
