@@ -20,6 +20,7 @@ func main() {
 	// Каталог
 	mux.HandleFunc("GET /", catalogHandler)
 	mux.HandleFunc("GET /product/{id}", productHandler)
+	mux.HandleFunc("GET /cache-demo", cacheDemoHandler)
 	mux.HandleFunc("POST /product/{id}/review", requireAuth(reviewSubmitHandler))
 
 	// Корзина (доступна только залогиненным — requireAuth проверяет это один раз)

@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 	"strings"
 )
 
@@ -39,7 +41,7 @@ func catalogHandler(w http.ResponseWriter, r *http.Request) {
 	if query != "" {
 		products, err = searchProducts(query)
 	} else {
-		products, err = listProducts()
+		products, err = listProductsCached()
 	}
 	if err != nil {
 		log.Println(err)
@@ -448,6 +450,7 @@ func adminSaveAllHandler(w http.ResponseWriter, r *http.Request, user *User) {
 			updateProduct(p.ID, price, stock)
 		}
 	}
+	invalidateCatalogCache() // после массового обновления сбрасываем кэш один раз
 	http.Redirect(w, r, "/admin?msg=Изменения сохранены", http.StatusSeeOther)
 }
 
@@ -478,4 +481,41 @@ func adminImageHandler(w http.ResponseWriter, r *http.Request, user *User) {
 		return
 	}
 	http.Redirect(w, r, "/admin?msg=Картинка обновлена", http.StatusSeeOther)
+}
+
+func cacheDemoHandler(w http.ResponseWriter, r *http.Request) {
+	const iterations = 1000
+
+	start := time.Now()
+	for i := 0; i < iterations; i++ {
+		listProducts()
+	}
+	dbDuration := time.Since(start)
+
+	listProductsCached()
+
+	start = time.Now()
+	for i := 0; i < iterations; i++ {
+		listProductsCached()
+	}
+	cacheDuration := time.Since(start)
+
+	ratio := float64(dbDuration) / float64(cacheDuration)
+
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprintf(w, `<html><head><meta charset="utf-8">
+<link rel="stylesheet" href="/static/style.css"></head><body>
+<div style="max-width:700px;margin:40px auto;padding:0 20px;font-family:Inter,sans-serif">
+<h1>Демонстрация кэша</h1>
+<p>Каждый способ вызван <b>%d</b> раз подряд:</p>
+<ul style="line-height:2">
+<li>Напрямую из базы (SQLite): <b>%v</b></li>
+<li>Из кэша (память процесса): <b>%v</b></li>
+</ul>
+<p style="font-size:1.3rem;color:#7c6bb0"><b>Кэш быстрее в %.1f раз</b></p>
+<p style="color:#6b6577">На %d товарах разница невелика — SQLite очень быстрый.
+Но на тяжёлых запросах (сложные JOIN, тысячи строк, внешние API) кэш даёт
+выигрыш в десятки и сотни раз.</p>
+<a href="/">← в каталог</a>
+</div></body></html>`, iterations, dbDuration, cacheDuration, ratio, len(catalogCache))
 }

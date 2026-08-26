@@ -11,6 +11,7 @@ func createProduct(title, description string, price int, imagePath string, stock
 		 VALUES (?, ?, ?, ?, ?)`,
 		title, description, price, imagePath, stock,
 	)
+	invalidateCatalogCache()
 	return err
 }
 
@@ -27,6 +28,7 @@ func updateProductImage(id int, imagePath string) error {
 		`UPDATE products SET image_path = ? WHERE id = ?`,
 		imagePath, id,
 	)
+	invalidateCatalogCache()
 	return err
 }
 
