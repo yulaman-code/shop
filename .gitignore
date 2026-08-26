@@ -1,8 +1,15 @@
+# Базы данных (генерируются при запуске)
 shop.db
 shop.db-journal
 shop.db-shm
 shop.db-wal
-shop_fix.db
+shop_fix*.db
+
+# Загруженные картинки (хранятся в Volume на проде)
+static/images/[0-9]*.png
+
+# macOS
 .DS_Store
-shop_fix.db
-.DS_Store
+
+# Резервные копии редактора
+*.save
