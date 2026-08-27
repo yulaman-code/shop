@@ -5,7 +5,7 @@
   <title>Магазин</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -23,6 +23,11 @@
       {{end}}
     </div>
   </nav>
+
+  <div class="hero">
+    <h1>Каталог.<br><span class="hero-grad">Всё, что нужно.</span></h1>
+    <p>Лучший способ купить то, что вы любите.</p>
+  </div>
 
   <div class="search-bar">
     <form method="GET" action="/">
@@ -56,7 +61,7 @@
         <p class="muted">{{.Description}}</p>
         <p class="price">{{.Price}} ₽</p>
         {{if gt .Stock 0}}
-        <form method="POST" action="/cart/add/{{.ID}}">
+        <form method="POST" action="/cart/add/{{.ID}}" class="add-form">
           <button type="submit">В корзину</button>
         </form>
         {{else}}
@@ -66,5 +71,27 @@
     </div>
     {{end}}
   </div>
+  <script>
+    document.querySelectorAll('.add-form').forEach((form) => {
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        const original = btn.textContent;
+        try {
+          const res = await fetch(form.action, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'fetch' },
+          });
+          if (res.ok) {
+            btn.textContent = '✓ Добавлено';
+            btn.disabled = true;
+            setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 1500);
+          }
+        } catch (err) {
+          form.submit(); // если fetch не удался — обычная отправка
+        }
+      });
+    });
+  </script>
 </body>
 </html>

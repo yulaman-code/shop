@@ -78,6 +78,10 @@ func cartAddHandler(w http.ResponseWriter, r *http.Request, user *User) {
 		log.Println(err)
 	}
 
+	if r.Header.Get("X-Requested-With") == "fetch" {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -288,7 +292,7 @@ func reviewSubmitHandler(w http.ResponseWriter, r *http.Request, user *User) {
 		return
 	}
 
-	http.Redirect(w, r, "/product/"+strconv.Itoa(id), http.StatusSeeOther)
+	http.Redirect(w, r, "/product/"+strconv.Itoa(id)+"#reviews", http.StatusSeeOther)
 }
 
 func accountHandler(w http.ResponseWriter, r *http.Request, user *User) {

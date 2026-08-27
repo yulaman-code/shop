@@ -5,7 +5,7 @@
   <title>{{.Product.Title}} — Магазин</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -46,7 +46,7 @@
       </div>
     </div>
 
-    <div class="reviews">
+    <div class="reviews" id="reviews">
       <h2>Отзывы
         {{if gt .ReviewCount 0}}
           <span class="rating-summary">★ {{printf "%.1f" .AvgRating}} ({{.ReviewCount}})</span>
